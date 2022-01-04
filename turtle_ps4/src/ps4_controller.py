@@ -19,7 +19,7 @@ def getDirection(data):
         speed -= 1
     if speed > 5 or speed < 1:
         speed = 1
-    return data.hat_rx * speed, data.hat_ly * speed;
+    return data.hat_rx * speed * -1, data.hat_ly * speed;
 
 
 def getColor(data):
@@ -53,10 +53,12 @@ def callback(data):
     # setting color
     r, g, b = getColor(data)
     if not (r == 0 and g == 0 and b == 0):
-        srv_col(r, g, b)
+        rospy.wait_for_service('turtle1/set_pen')
+        srv_col(r, g, b, 1, False)
 
     # clearing screen (i.e. the pen trail)
     if data.ps and not old_data.ps:
+        rospy.wait_for_service('clear')
         srv_clr()
 
     old_t = t
