@@ -11,14 +11,17 @@ old_t = Twist()
 speed = 1
 
 
+def clamp(n, minn, maxn):
+    return max(min(maxn, n), minn)
+
+
 def getDirection(data):
     global speed
     if data.dpad_y > old_data.dpad_y:
         speed += 1
     elif data.dpad_y < old_data.dpad_y:
         speed -= 1
-    if speed > 5 or speed < 1:
-        speed = 1
+    speed = clamp(speed, 1, 5)
     return data.hat_rx * speed * -1, data.hat_ly * speed;
 
 
