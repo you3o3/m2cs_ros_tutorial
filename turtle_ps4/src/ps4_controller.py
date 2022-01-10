@@ -17,12 +17,12 @@ def clamp(n, minn, maxn):
 
 def getDirection(data):
     global speed
-    if data.dpad_y > old_data.dpad_y:
+    if data.dpad_y > 0 and not (data.dpad_y == old_data.dpad_y):
         speed += 1
-    elif data.dpad_y < old_data.dpad_y:
+    elif data.dpad_y < 0 and not (data.dpad_y == old_data.dpad_y):
         speed -= 1
     speed = clamp(speed, 1, 5)
-    return data.hat_rx * speed * -1, data.hat_ly * speed;
+    return data.hat_rx * speed, data.hat_ly * speed
 
 
 def getColor(data):
