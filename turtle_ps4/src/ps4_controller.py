@@ -3,7 +3,7 @@ import rospy
 from geometry_msgs.msg import Twist
 from turtlesim.srv import SetPen
 from std_srvs.srv import Empty
-from m2_ps4.srv import Ps4Data
+from m2_ps4.msg import Ps4Data
 # hint: some imports are missing
 
 old_data = Ps4Data()
