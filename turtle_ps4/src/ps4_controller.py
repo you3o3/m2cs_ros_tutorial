@@ -3,7 +3,8 @@ import rospy
 from geometry_msgs.msg import Twist
 from turtlesim.srv import SetPen
 from std_srvs.srv import Empty
-from m2_ps4.srv import Ps4Data
+from m2_ps4.msg import Ps4Data
+
 # hint: some imports are missing
 
 old_data = Ps4Data()
@@ -11,15 +12,18 @@ old_t = Twist()
 speed = 1
 
 
+def clamp(n, minn, maxn):
+    return max(min(maxn, n), minn)
+
+
 def getDirection(data):
     global speed
-    if data.dpad_y > old_data.dpad_y:
+    if data.dpad_y > 0 and not (data.dpad_y == old_data.dpad_y):
         speed += 1
-    elif data.dpad_y < old_data.dpad_y:
+    elif data.dpad_y < 0 and not (data.dpad_y == old_data.dpad_y):
         speed -= 1
-    if speed > 5 or speed < 1:
-        speed = 1
-    return data.hat_rx * speed, data.hat_ly * speed;
+    speed = clamp(speed, 1, 5)
+    return data.hat_rx * speed, data.hat_ly * speed
 
 
 def getColor(data):
@@ -37,14 +41,14 @@ def getColor(data):
 def callback(data):
     global old_data
     global old_t
-    
+
     # you should publish the velocity here!
-    
+
     # hint: to detect a button being pressed, you can use the following pseudocode:
-    # 
+    #
     # if ((data.button is pressed) and (old_data.button not pressed)),
     # then do something...
-    
+
     t = Twist()
     t.angular.z, t.linear.x = getDirection(data)
     if not (t.angular.z == old_t.angular.z and t.linear.x == old_t.angular.z):
@@ -53,10 +57,12 @@ def callback(data):
     # setting color
     r, g, b = getColor(data)
     if not (r == 0 and g == 0 and b == 0):
-        srv_col(r, g, b)
+        rospy.wait_for_service('turtle1/set_pen')
+        srv_col(r, g, b, 1, False)
 
     # clearing screen (i.e. the pen trail)
     if data.ps and not old_data.ps:
+        rospy.wait_for_service('clear')
         srv_clr()
 
     old_t = t
@@ -65,16 +71,16 @@ def callback(data):
 
 if __name__ == '__main__':
     rospy.init_node('ps4_controller')
-    
+
     pub = rospy.Publisher('turtle1/cmd_vel', Twist, queue_size=1)
     # publisher object goes here... hint: the topic type is Twist
     sub = rospy.Subscriber('input/ps4_data', Ps4Data, callback)
     # subscriber object goes here
-    
+
     # one service object is needed for each service called!
     srv_col = rospy.ServiceProxy('turtle1/set_pen', SetPen)
     srv_clr = rospy.ServiceProxy('clear', Empty)
     # service client object goes here... hint: the srv type is SetPen
     # fill in the other service client object...
-    
+
     rospy.spin()
