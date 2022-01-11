@@ -4,7 +4,10 @@ from geometry_msgs.msg import Twist
 from turtlesim.srv import SetPen
 from std_srvs.srv import Empty
 from m2_ps4.msg import Ps4Data
+<<<<<<< HEAD
 
+=======
+>>>>>>> f74acfc14ff54e8f97e344d055f2501268a225a9
 # hint: some imports are missing
 
 old_data = Ps4Data()
