@@ -14,7 +14,7 @@
 #include "std_msgs/Int32.h"
 // add the includes needed for socketCAN
 
-int pow(int x, int exp) {
+int int_pow(int x, int exp) {
     int result = 1;
     for (int i = 0; i < exp; i++){
         result *= x;
@@ -63,11 +63,13 @@ int main(int argc, char **argv) {
     	}
 
         // print data
-        ROS_INFO("0x%03X [%d] ",frame.can_id, frame.can_dlc);
+        char data_str[128];
+        int idx = 0;
+        ROS_INFO("0x%03X [%d] ", frame.can_id, frame.can_dlc);
         for (int i = 0; i < frame.can_dlc; i++) {
-            ROS_INFO("%02X ",frame.data[i]);
+            idx += snprintf(data_str+idx, sizeof data_str, "%02X ", frame.data[i]);
         }
-        ROS_INFO("\r\n");
+        ROS_INFO("%s\n", data_str);
 
         // fill in msg based on the contents from CAN frame
         if (frame.can_dlc-4 < 0){
@@ -78,7 +80,7 @@ int main(int argc, char **argv) {
         std_msgs::Int32 msg;
         msg.data = 0;
         for (int i = frame.can_dlc-1; i >= frame.can_dlc-4; i--) {
-            msg.data += frame.data[i] * pow(16, hexcount);
+            msg.data += frame.data[i] * int_pow(16, hexcount);
             hexcount -= 2;
         }
         // publish msg
