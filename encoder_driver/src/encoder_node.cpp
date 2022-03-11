@@ -23,7 +23,6 @@ int int_pow(int x, int exp) {
 }
 
 int main(int argc, char **argv) {
-
     ros::init(argc, argv, "encoder_node");
     ros::NodeHandle nh;
 
@@ -63,7 +62,7 @@ int main(int argc, char **argv) {
     	}
 
         // print data
-        char data_str[128];
+        char data_str[32];
         int idx = 0;
         ROS_INFO("0x%03X [%d] ", frame.can_id, frame.can_dlc);
         for (int i = 0; i < frame.can_dlc; i++) {
@@ -72,14 +71,15 @@ int main(int argc, char **argv) {
         ROS_INFO("%s\n", data_str);
 
         // fill in msg based on the contents from CAN frame
-        if (frame.can_dlc-4 < 0){
+        uint8_t len = frame.data[0];
+        if (len-3 < 4){ // len of data only, exclude first 3 ele
             perror("Not enough data to parse int32");
             return 1;
         }
         int hexcount = 6;
         std_msgs::Int32 msg;
         msg.data = 0;
-        for (int i = frame.can_dlc-1; i >= frame.can_dlc-4; i--) {
+        for (int i = len-1; i >= len-4; i--) {
             msg.data += frame.data[i] * int_pow(16, hexcount);
             hexcount -= 2;
         }
