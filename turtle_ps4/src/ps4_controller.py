@@ -50,7 +50,7 @@ def callback(data):
 
     t = Twist()
     t.angular.z, t.linear.x = getDirection(data)
-    if not (t.angular.z == old_t.angular.z and t.linear.x == old_t.angular.z):
+    if not (t.angular.z == old_t.angular.z and t.linear.x == old_t.linear.x):
         pub.publish(t)
 
     # setting color
