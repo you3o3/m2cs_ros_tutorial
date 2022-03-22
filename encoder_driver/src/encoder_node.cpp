@@ -21,19 +21,11 @@ int main(int argc, char **argv) {
     ros::Publisher encoder_pub = nh.advertise<std_msgs::Int32>("p_feedback", 1);
 
     // param from launch file
-    int can_id;
-    if (nh.getParam("can_id", can_id)) {
-        ROS_INFO("%s: Can id: %i", node_name.c_str(), can_id);
+    int id;
+    if (nh.getParam("id", id)) {
+        ROS_INFO("%s: id: %i", node_name.c_str(), id);
     } else {
         ROS_ERROR("%s: Cannot retrieve can id", node_name.c_str());
-        return 1;
-    }
-
-    int device_id;
-    if (nh.getParam("device_id", device_id)) {
-        ROS_INFO("%s: Device id: %i", node_name.c_str(), device_id);
-    } else {
-        ROS_ERROR("%s: Cannot retrieve device id", node_name.c_str());
         return 1;
     }
 
@@ -62,7 +54,7 @@ int main(int argc, char **argv) {
     }
 
     can_filter rfilter[1];
-    rfilter[0].can_id   = can_id;
+    rfilter[0].can_id   = id;
     rfilter[0].can_mask = CAN_EFF_MASK; // enable all 29 filter bits
 
     setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
@@ -73,10 +65,9 @@ int main(int argc, char **argv) {
      	if (nbytes < 0) {
             ROS_ERROR_THROTTLE(1, "Read");
             continue;
-    	}
-        if (frame.data[1] != device_id) {
-            // device id not match
-            // TODO: how to handle this
+        }
+        if (frame.data[1] != id) {
+            ROS_WARN_THROTTLE(1, "id not match");
             continue;
         }
 

@@ -1,9 +1,7 @@
 <launch>
-    <arg name="can_id" default="1" />
-    <arg name="device_id" default="1" />
+    <arg name="id" default="1" />
 
-    <node name="encoder_$(arg device_id)" pkg="encoder_driver" type="encoder_node" output="screen">
-        <param name="can_id" value="$(arg can_id)" />
-        <param name="device_id" value="$(arg device_id)" />
+    <node name="encoder_$(arg id)" pkg="encoder_driver" type="encoder_node" output="screen">
+        <param name="id" value="$(arg id)" />
     </node>
 </launch>
